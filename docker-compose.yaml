@@ -1,0 +1,57 @@
+version: '2.3'
+
+services:
+
+  cv_sum:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ./logs:/usr/src/app/logs
+    ports:
+      - 8081:8080
+    depends_on:
+      - worker
+    environment: &env
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      PYTHONOPTIMIZE: 1
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_BROKER_TRANSPORT: "redis"
+      CELERY_BROKER_HOST: "redis"
+      CELERY_BROKER_PORT: 6379
+      CELERY_BROKER_VHOST: "0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+      CELERY_BROKER_CONNECTION_TIMEOUT: 10
+      CELERY_BROKER_CONNECTION_MAX_RETRIES: 0
+      GPU_NUMBER: 0
+    command: /root/miniconda/bin/python -m swagger_server
+    restart: always
+
+  launcher:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ./logs:/usr/src/app/logs
+    ports:
+      - 8080:8080
+    depends_on:
+      redis:
+        condition: service_started
+      minio:
+        condition: service_healthy
+
+    environment: *env
+    restart: always
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379
+    volumes:
+      - ./redis_data:/data
+    restart: always
+
+volumes:
+  redis_data:

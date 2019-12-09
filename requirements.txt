@@ -1,0 +1,10 @@
+beautifulsoup4
+jupyter
+dask[complete]
+pandas
+pandasql
+featuretools
+requests
+redis
+wget
+urllib3
