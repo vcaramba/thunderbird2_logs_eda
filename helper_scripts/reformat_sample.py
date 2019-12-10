@@ -18,7 +18,7 @@ with open('../data/tbird2.csv', 'r', newline='') as file:
     gc.collect()
 
     for first, last in zip(first_vars, last_vars):
-        first[0] = first[0].lstrip('\"') # remove extra quotes
+        first[0] = first[0].lstrip('\"')  # remove extra quotes
         first.append(last.rstrip('\r\n')) # remove trailing character from log messages
 
     df = pd.DataFrame(first_vars,
